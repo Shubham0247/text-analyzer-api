@@ -51,5 +51,5 @@ jobs:
       - name: Update Lambda Function
         run: |
           aws lambda update-function-code \
-            --function-name TextAnalyzerFunction \
+            --function-name TextAnalyzerContainer \
             --image-uri 917928546588.dkr.ecr.ap-southeast-2.amazonaws.com/text-analyzer-api:latest
