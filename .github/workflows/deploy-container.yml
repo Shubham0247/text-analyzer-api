@@ -1,0 +1,55 @@
+name: Deploy Lambda using Container
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Build and Deploy Container to Lambda
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1️⃣ Checkout code
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # 2️⃣ Configure AWS credentials
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-southeast-2
+
+      # 3️⃣ Login to Amazon ECR
+      - name: Login to Amazon ECR
+        run: |
+          aws ecr get-login-password --region ap-southeast-2 | \
+          docker login --username AWS --password-stdin \
+          917928546588.dkr.ecr.ap-southeast-2.amazonaws.com
+
+      # 4️⃣ Build Docker image
+      - name: Build Docker image
+        run: |
+          docker build -t text-analyzer-api .
+
+      # 5️⃣ Tag Docker image
+      - name: Tag Docker image
+        run: |
+          docker tag text-analyzer-api:latest \
+          917928546588.dkr.ecr.ap-southeast-2.amazonaws.com/text-analyzer-api:latest
+
+      # 6️⃣ Push image to ECR
+      - name: Push Docker image
+        run: |
+          docker push \
+          917928546588.dkr.ecr.ap-southeast-2.amazonaws.com/text-analyzer-api:latest
+
+      # 7️⃣ Update Lambda to use container image
+      - name: Update Lambda Function
+        run: |
+          aws lambda update-function-code \
+            --function-name TextAnalyzerFunction \
+            --image-uri 917928546588.dkr.ecr.ap-southeast-2.amazonaws.com/text-analyzer-api:latest
