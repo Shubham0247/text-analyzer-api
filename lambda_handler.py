@@ -26,5 +26,4 @@ def analyze_text(data: TextRequest):
         "sentence_count": sentences
     }
 
-# Lambda handler
-handler = Mangum(app)
+lambda_handler = Mangum(app)

@@ -24,7 +24,7 @@ jobs:
       
       - name: Copy Application Code
         run: |
-          cp -r app package/
+          cp lambda_function.py package/
 
       - name: Create ZIP file
         run: |
